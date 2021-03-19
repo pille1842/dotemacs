@@ -188,7 +188,11 @@
   :hook (org-mode . eh/org-mode-setup)
   :config
   (setq org-ellipsis " ▾")
-  (eh/org-font-setup))
+  (eh/org-font-setup)
+  (setq org-agenda-files '("~/org"))
+  (global-set-key (kbd "C-c l") 'org-store-link)
+  (global-set-key (kbd "C-c a") 'org-agenda)
+  (global-set-key (kbd "C-c c") 'org-capture))
 
 (use-package org-bullets
   :after org
