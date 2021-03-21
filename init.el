@@ -58,6 +58,7 @@
 
 ;; Authentication sources
 (setq auth-sources '("~/.authinfo.gpg"))
+(customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
 
 ;; Initialize package system
 (require 'package)
