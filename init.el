@@ -186,13 +186,13 @@
 (use-package org
   :ensure org-plus-contrib
   :hook (org-mode . eh/org-mode-setup)
+  :bind (("C-c l" . org-store-link)
+	 ("C-c a" . org-agenda)
+	 ("C-c c" . org-capture))
   :config
   (setq org-ellipsis " ▾")
   (eh/org-font-setup)
-  (setq org-agenda-files '("~/org"))
-  (global-set-key (kbd "C-c l") 'org-store-link)
-  (global-set-key (kbd "C-c a") 'org-agenda)
-  (global-set-key (kbd "C-c c") 'org-capture))
+  (setq org-agenda-files '("~/org")))
 
 (use-package org-bullets
   :after org
