@@ -1,0 +1,278 @@
+#+TITLE: GNU Emacs operating system settings
+#+AUTHOR: Eric Haberstroh
+#+EMAIL: gpg@erixpage.de
+#+DATE: <2021-03-31 Mi>
+
+* Overview
+** Canonical links to this document
+- HTML version :: [[http://www.erixpage.de/dotemacs]]
+- Git repository :: [[https://github.com/pille1842/dotemacs]]
+
+** What is this?
+This document, referred to in the source code as =erix-emacs.org=, contains most of my configurations for GNU Emacs. In its structure it is heavily influenced by Protesilaos Stavrou's well-documented and beautifully presented [[https://protesilaos.com/dotemacs][Emacs configuration]]. Its contents also frequently borrow from "Prot", but I have been equally inspired by the System Crafters YouTube series [[https://www.youtube.com/playlist?list=PLEoMzSkcN8oPH1au7H6B7bBJ4ZO7BXjSZ][Emacs From Scratch]], a repository of which can be found on [[https://github.com/daviwil/emacs-from-scratch][GitHub]].
+
+My Emacs configuration is designed using the principles of literate programming. Each section not only contains the code that will automatically produce the actual Emacs configuration file, but it also contains additional information, links to sources, annotations and comments to make this document a more useful resource for its human readers.
+
+This document is written using Orgmode. When starting Emacs, a =erix-emacs.el= file is automatically produced and loaded, containing all the Emacs Lisp source code blocks in this file. Another initialization file exists for the sole purpose of bootstrapping this document.
+
+** General design considerations
+This configuration relies mainly on the [[https://github.com/jwiegley/use-package][use-package]] macro which makes creating a reproducible and consistent configuration much easier. This document lays out which packages are needed for a fully configured Emacs, and how each of these packages should in turn be fine-tuned to my liking. Use-package will ensure that all these packages are actually installed on the system from which this configuration is run.
+
+This configuration has been tested on the following system:
+
+#+begin_src emacs-lisp :tangle no :exports results
+  (format "System type:   %s\nOS release:    %s\nEmacs version: %s"
+          system-type
+          operating-system-release
+          emacs-version)
+#+end_src
+
+#+RESULTS:
+: System type:   gnu/linux
+: OS release:    5.8.0-48-generic
+: Emacs version: 27.1
+
+** Contents of my init.el
+These are the contents of =init.el=, which is responsible for tangling (i.e. extracting the source code blocks from) and loading this document.
+
+#+include: init.el src emacs-lisp :tangle no
+
+* Entire configuration (for now)
+
+#+begin_src emacs-lisp
+  ;; Don't save customizations in this init file. The custom-file will
+  ;; be loaded at the end
+  (custom-set-default 'custom-file (concat user-emacs-directory "custom.el"))
+
+  ;; Default font size
+  (defvar eh/default-font-size 120 "Default font size for this system")
+
+  ;; Clean up the UI
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tooltip-mode -1)
+  (set-fringe-mode 10)
+  (setq visible-bell t
+        inhibit-splash-screen t
+        frame-title-format '(multiple-frames "%b"
+                                             "Emacs"))
+
+  ;; Font and cursor
+  (set-face-attribute 'default nil :font "Fira Code Retina" :height eh/default-font-size)
+  (setq-default cursor-type 'bar)
+
+  ;; Authentication sources
+  (setq auth-sources '("~/.authinfo.gpg"))
+  (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
+
+  ;; Initialize package system
+  
+
+  ;; Theme: doom-dracula from https://github.com/hlissner/emacs-doom-themes
+  (use-package doom-themes
+    :init (load-theme 'doom-dracula t))
+
+  ;; Enable ligatures from https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
+  (use-package fira-code-mode
+    :hook prog-mode)
+
+  ;; doom-modeline
+  (use-package doom-modeline
+    :init
+    (doom-modeline-mode 1)
+    :custom
+    ((doom-modeline-height 15)))
+
+  ;; Line numbers, column numbers and current line
+  (global-display-line-numbers-mode 1)
+  (column-number-mode 1)
+  (global-hl-line-mode 1)
+
+  ;; Rainbow delimiters (colorful parentheses)
+  (use-package rainbow-delimiters
+    :hook
+    (prog-mode . rainbow-delimiters-mode))
+
+  ;; No line numbers in certain modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode -1))))
+
+  ;; Smooth scrolling (keep more context when moving the cursor)
+  (use-package smooth-scrolling
+    :init
+    (smooth-scrolling-mode 1))
+
+  ;; Completion framework
+  (use-package ivy
+    :init
+    (ivy-mode 1))
+
+  ;; Enhanced versions of common Emacs commands
+  (use-package counsel
+    :bind (("M-x" . counsel-M-x)
+           ("C-h b" . counsel-descbinds)
+           ("C-h a" . counsel-apropos)
+           ("C-x C-f" . counsel-find-file)
+           :map minibuffer-local-map
+           ("C-r" . 'counsel-minibuffer-history)))
+
+  ;; More annotations in completion lists
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+
+  ;; Swiper for text search
+  (use-package swiper
+    :bind (("C-s" . swiper)
+           ("C-r" . swiper-backward)))
+
+  ;; which-key for discoverability
+  (use-package which-key
+    :init
+    (which-key-mode 1))
+
+  ;; Better Emacs *Help* buffer
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-callable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+
+  ;; Orgmode
+  (defun eh/org-mode-setup ()
+    "Set up various things for Orgmode buffers"
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (visual-line-mode 1))
+
+  (defun eh/org-font-setup ()
+    "Set up font rendering in Orgmode buffers"
+    (font-lock-add-keywords 'org-mode
+                            '(("^ *\\([-]\\) "
+                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+     ;; Set faces for heading levels
+    (dolist (face '((org-level-1 . 1.2)
+                    (org-level-2 . 1.1)
+                    (org-level-3 . 1.05)
+                    (org-level-4 . 1.0)
+                    (org-level-5 . 1.1)
+                    (org-level-6 . 1.1)
+                    (org-level-7 . 1.1)
+                    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font "DejaVu Sans" :weight 'regular :height (cdr face)))
+
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+  (use-package org
+    :ensure org-plus-contrib
+    :hook (org-mode . eh/org-mode-setup)
+    :bind (("C-c l" . org-store-link)
+           ("C-c a" . org-agenda)
+           ("C-c c" . org-capture))
+    :config
+    (setq org-ellipsis " ▾")
+    (eh/org-font-setup)
+    (setq org-agenda-files '("~/org")))
+
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+  (defun eh/org-mode-visual-fill ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :hook (org-mode . eh/org-mode-visual-fill))
+
+  ;; Project management
+  (use-package projectile
+    :config
+    (projectile-mode 1)
+    :custom
+    ((projectile-completion-system 'ivy))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Code")
+      (setq projectile-project-search-path '("~/Code")))
+    (setq projectile-switch-project-action #'projectile-dired))
+
+  (use-package counsel-projectile
+    :config
+    (counsel-projectile-mode))
+
+  (use-package magit
+    :custom
+    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+  (use-package forge
+    :after magit)
+
+  ;; Treemacs
+  (use-package treemacs
+    :bind
+    (("M-0" . treemacs-select-window)
+     ("C-x t 1" . treemacs-delete-other-windows)
+     ("C-x t t" . treemacs)
+     ("C-x t B" . treemacs-bookmark)
+     ("C-x t C-t" . treemacs-find-file)
+     ("C-x t M-t" . treemacs-find-tag)))
+
+  (use-package treemacs-projectile
+    :after (treemacs projectile))
+
+  (use-package treemacs-icons-dired
+    :after (treemacs dired)
+    :config (treemacs-icons-dired-mode))
+
+  (use-package treemacs-magit
+    :after (treemacs magit))
+
+  ;; Development
+
+  ;; Enable electric-pair-mode in all prog-mode buffers
+  (add-hook 'prog-mode-hook 'electric-pair-mode)
+
+  ;; Language Server Protocol (LSP)
+  (use-package lsp-mode
+    :hook ((php-mode . lsp)
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp
+    :init
+    (setq lsp-keymap-prefix "C-c x"))
+
+  ;; LSP enhancements
+  (use-package lsp-ui :commands lsp-ui-mode)
+  (use-package lsp-ivy :commands lsp-ivy-workspace-symbol)
+  (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+  ;; PHP
+  (use-package php-mode)
+
+  ;; Use <pause> key to save the current buffer
+  (global-set-key (kbd "<pause>")
+                  'save-buffer)
+
+  ;; Load the custom-file if it exists
+  (when (file-exists-p custom-file)
+    (load custom-file))
+#+end_src
