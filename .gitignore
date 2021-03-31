@@ -1,0 +1,11 @@
+*.html
+*~
+.cache/
+.lsp-session-*
+auto-save-list/
+elpa/*
+erix-emacs.el*
+forge-database.sqlite
+lsp-cache/
+projectile-bookmarks.eld
+transient/
