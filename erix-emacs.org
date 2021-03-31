@@ -55,17 +55,11 @@ This file is distributed in the hope that it will be useful, but WITHOUT ANY WAR
 
 You should have received a copy of the GNU General Public License along with this file. If not, see <[[http://www.gnu.org/licenses/]]>.
 
-* Entire configuration (for now)
+* Interface
+This section adapts the Emacs interface to be less cluttered and to look cleaner and, arguably, more beautiful than what the default Emacs experience provides for.
 
+** Clean up the UI
 #+begin_src emacs-lisp
-  ;; Don't save customizations in this init file. The custom-file will
-  ;; be loaded at the end
-  (custom-set-default 'custom-file (concat user-emacs-directory "custom.el"))
-
-  ;; Default font size
-  (defvar eh/default-font-size 120 "Default font size for this system")
-
-  ;; Clean up the UI
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
   (tooltip-mode -1)
@@ -74,9 +68,36 @@ You should have received a copy of the GNU General Public License along with thi
         inhibit-splash-screen t
         frame-title-format '(multiple-frames "%b"
                                              "Emacs"))
+#+end_src
 
-  ;; Font and cursor
-  (set-face-attribute 'default nil :font "Fira Code Retina" :height eh/default-font-size)
+** Font
+[[https://github.com/tonsky/FiraCode][Fira Code]] is a free monotype font containing ligatures for common programming multi-character combinations. To prepare for the terrible case that Fira Code is not installed on the system, an additional check is performed using the =fc-list= program which should be in your PATH.
+
+#+begin_src emacs-lisp
+  (defun erix-font-installed-p (font)
+    "Return t if the given FONT is installed on the system, nil otherwise.
+
+  This works by calling the fc-list program to search for fonts
+  matching the given pattern."
+    (not (string= "" (shell-command-to-string (concat "fc-list \"" font "\"")))))
+
+  (defvar erix-default-font-name "Fira Code Retina" "Default font name")
+  (defvar erix-default-font-size 120 "Default font size")
+
+  (when (erix-font-installed-p erix-default-font-name)
+    (set-face-attribute
+     'default nil
+     :font erix-default-font-name
+     :height erix-default-font-size))
+#+end_src
+
+* Rest of the configuration (for now)
+
+#+begin_src emacs-lisp
+  ;; Don't save customizations in this init file. The custom-file will
+  ;; be loaded at the end
+  (custom-set-default 'custom-file (concat user-emacs-directory "custom.el"))
+
   (setq-default cursor-type 'bar)
 
   ;; Authentication sources
@@ -84,7 +105,7 @@ You should have received a copy of the GNU General Public License along with thi
   (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
 
   ;; Initialize package system
-  
+
 
   ;; Theme: doom-dracula from https://github.com/hlissner/emacs-doom-themes
   (use-package doom-themes
