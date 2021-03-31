@@ -79,7 +79,11 @@ This section adapts the Emacs interface to be less cluttered and to look cleaner
 
   This works by calling the fc-list program to search for fonts
   matching the given pattern."
-    (not (string= "" (shell-command-to-string (concat "fc-list \"" font "\"")))))
+    (not
+     (string= ""
+              (shell-command-to-string
+               (concat "fc-list "
+                       (shell-quote-argument font))))))
 
   (defvar erix-default-font-name "Fira Code Retina" "Default font name")
   (defvar erix-default-font-size 120 "Default font size")
