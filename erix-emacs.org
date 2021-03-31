@@ -1,7 +1,16 @@
 #+TITLE: GNU Emacs operating system settings
 #+AUTHOR: Eric Haberstroh
 #+EMAIL: gpg@erixpage.de
-#+DATE: <2021-03-31 Mi>
+#+OPTIONS: toc:nil
+#+MACRO: export-date (eval (format-time-string "%F %R %z" (current-time)))
+#+MACRO: emacs-development-version (eval (substring (emacs-version) 0 14))
+
+- Created: 2021-03-31.
+- Updated: *{{{export-date}}}*.
+- Emacs Version: {{{emacs-development-version}}}.
+- File history: https://github.com/pille1842/dotemacs/commits/conf21
+
+  #+TOC: headlines 8 insert TOC here, with eight headline levels
 
 * Overview
 ** Canonical links to this document
