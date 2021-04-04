@@ -77,6 +77,21 @@ This section adapts the Emacs interface to be less cluttered and to look cleaner
                                              "Emacs"))
 #+end_src
 
+** Cursor type
+There are a few shapes available for the cursor in Emacs:
+
+- =box= (which is the default)
+- =hollow= (a hollow box)
+- =bar= (a vertical bar)
+- =hbar= (a horizontal bar)
+- =nil= (no cursor at all).
+
+No cursor at all seems a little too minimalistic, so the =bar= type is used instead. You can actually set the cursor for each individual buffer via the buffer-local variable =cursor-type=, but for consistency, the same cursor shape will be used throughout.
+
+#+begin_src emacs-lisp
+  (setq-default cursor-type 'bar)
+#+end_src
+
 ** Font
 [[https://github.com/tonsky/FiraCode][Fira Code]] is a free monotype font containing ligatures for common programming multi-character combinations. To prepare for the terrible case that Fira Code is not installed on the system, an additional check is performed using the =fc-list= program which should be in your PATH.
 
@@ -102,6 +117,30 @@ This section adapts the Emacs interface to be less cluttered and to look cleaner
      :height erix-default-font-size))
 #+end_src
 
+*** Ligatures
+
+In typography, a ligature occurs when two or more graphemes or letters are joined as a single glyph. One defining feature of Fira Code is that it contains ligatures for grapheme groups commonly used in various programming languages. There is a package to make this feature work in Emacs. The minor mode will be enabled in all =prog-mode= buffers. This is taken from the [[https://github.com/tonsky/FiraCode/wiki/Emacs-instructions][Fira Code Emacs instructions]].
+
+#+begin_src emacs-lisp
+  (use-package fira-code-mode
+    :hook prog-mode)
+#+end_src
+
+** Theme
+[[https://draculatheme.com/][Dracula]] is a theme available for many applications, including various terminal emulators, vim, Visual Studio Code, and Emacs.
+
+This is a probably a pretty wasteful way to use Dracula in Emacs: It is part of the [[https://github.com/hlissner/emacs-doom-themes][doom-themes]] package (together with a gazillion others that will go unused).
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :init (load-theme 'doom-dracula t))
+#+end_src
+
+*** Screenshot
+Here is a screenshot of the init.el file generated from this document, rendered in the Dracula theme:
+
+[[./screenshot-dracula.png]]
+
 * Rest of the configuration (for now)
 
 #+begin_src emacs-lisp
@@ -109,8 +148,7 @@ This section adapts the Emacs interface to be less cluttered and to look cleaner
   ;; be loaded at the end
 
 
-  (setq-default cursor-type 'bar)
-
+ 
   ;; Authentication sources
   (setq auth-sources '("~/.authinfo.gpg"))
   (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
@@ -118,13 +156,7 @@ This section adapts the Emacs interface to be less cluttered and to look cleaner
   ;; Initialize package system
 
 
-  ;; Theme: doom-dracula from https://github.com/hlissner/emacs-doom-themes
-  (use-package doom-themes
-    :init (load-theme 'doom-dracula t))
-
-  ;; Enable ligatures from https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
-  (use-package fira-code-mode
-    :hook prog-mode)
+  ;; Enable ligatures from 
 
   ;; doom-modeline
   (use-package doom-modeline
