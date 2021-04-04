@@ -137,7 +137,7 @@ This is a probably a pretty wasteful way to use Dracula in Emacs: It is part of 
 #+end_src
 
 *** Screenshot
-Here is a screenshot of the init.el file generated from this document, rendered in the Dracula theme:
+Here is a screenshot of the init.el file in this repository, rendered in the Dracula theme:
 
 [[./screenshot-dracula.png]]
 
