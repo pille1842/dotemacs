@@ -148,7 +148,7 @@ Here is a screenshot of the init.el file in this repository, rendered in the Dra
   ;; be loaded at the end
 
 
- 
+
   ;; Authentication sources
   (setq auth-sources '("~/.authinfo.gpg"))
   (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
@@ -220,12 +220,14 @@ Here is a screenshot of the init.el file in this repository, rendered in the Dra
   (use-package helpful
     :custom
     (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
     :bind
     ([remap describe-function] . counsel-describe-function)
     ([remap describe-command] . helpful-command)
     ([remap describe-variable] . counsel-describe-variable)
-    ([remap describe-key] . helpful-key))
+    ([remap describe-key] . helpful-key)
+    :config
+    (setq find-function-C-source-directory "~/Code/emacs-27.1/src"))
 
   ;; Orgmode
   (defun eh/org-mode-setup ()
