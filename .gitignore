@@ -2,6 +2,7 @@
 *~
 .cache/
 .lsp-session-*
+.org-id-locations
 auto-save-list/
 elpa/*
 erix-emacs.el*
