@@ -153,7 +153,7 @@ TRAMP is called "transparent" because it handles all the "remote" parts of acces
 As you can see, you can use the usual =find-file= command to access a remote path. The default method is "scp", but "ssh" is actually faster, so the first thing to do is to set "ssh" as TRAMP's default access method.
 
 #+begin_src emacs-lisp
-  (custom-set-variables 'tramp-default-method "ssh")
+  (customize-set-variable 'tramp-default-method "ssh")
 #+end_src
 
 ** Inline methods
