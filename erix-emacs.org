@@ -242,7 +242,8 @@ This depends on the value of =erix-emacs-config-html-target= being correctly set
                    (buffer-file-name))
       (org-html-export-to-html)
       (when erix-emacs-config-html-target
-        (copy-file (expand-file-name "erix-emacs.html" user-emacs-directory)
+        (copy-file (erix-emacs--expand-file-name erix-emacs-configuration-main-file
+                                                 ".html")
                    erix-emacs-config-html-target
                    t))))
 
