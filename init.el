@@ -87,8 +87,7 @@ of it."
       (delete-file main-init-el))
     (require 'org)
     (when (file-exists-p main-init-org)
-      (org-babel-tangle-file main-init-org main-init-el)
-      (byte-compile-file main-init-el))))
+      (org-babel-tangle-file main-init-org main-init-el))))
 
 (add-hook 'kill-emacs-hook #'erix-emacs-build-config)
 
