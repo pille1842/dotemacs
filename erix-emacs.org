@@ -141,23 +141,90 @@ Here is a screenshot of the init.el file in this repository, rendered in the Dra
 
 [[./screenshot-dracula.png]]
 
+* Networking and TRAMP
+TRAMP stands for "Transparent Remote (file) Access, Multiple Protocol". This package provides remote file editing, similar to Ange FTP, which will also be configured slightly in this section. You can find out more about TRAMP in the [[info:tramp#Top][manual]].
+
+TRAMP is called "transparent" because it handles all the "remote" parts of accessing a particular file. To the rest of Emacs, a file accessed through TRAMP looks just like any other file. Here's an example: To edit a file =/path/to/file.txt= on a machine accessible through SSH, e.g. on =remotehost=, you simply type the following command:
+
+#+begin_src text
+  C-x C-f /remotehost:/path/to/file.txt RET
+#+end_src
+
+As you can see, you can use the usual =find-file= command to access a remote path. The default method is "scp", but "ssh" is actually faster, so the first thing to do is to set "ssh" as TRAMP's default access method.
+
+#+begin_src emacs-lisp
+  (custom-set-variables 'tramp-default-method "ssh")
+#+end_src
+
+** Inline methods
+TRAMP can also be used with other protocols than SSH or SCP. Some of these are called "inline methods" because all the necessary communication is handled directly within Emacs. Some of these are:
+
+- rsh (insecure, use SSH instead)
+- telnet (insecure, use SSH instead)
+- su / *sudo* (for accessing files with the permissions of another user on the system)
+
+The sudo method is particularly interesting since it allows you to edit files only accessible as root directly in your current Emacs session, without starting Emacs as root or hopping into a terminal. To edit the contents of =/etc/passwd=, simply type:
+
+#+begin_src text
+  C-x C-f /sudo::/etc/passwd RET
+#+end_src
+
+TRAMP will prompt you for the password of =root@yourhost=, possibly right after typing =/sudo::=. This prompt is misleading, since what you're actually being prompted for is your own password, at least on a modern Linux system where you are part of the "sudoers" and can execute commands as root with your own credentials.
+
+Another thing to note are the two colons after "sudo". Why two? Well, the generic syntax for TRAMP paths is:
+
+#+begin_src text
+  /method:user@host:/path/to/file
+#+end_src
+
+In the case of sudo on the local machine, you don't actually need to specify any user or host, so to indicate that you're skipping that part of the path, type another colon to get to the =/path/to/file= part.
+
+** External methods
+In addition to methods built right into Emacs, TRAMP can use external programs to access remote files. Some of these are:
+
+- rcp (insecure, use scp instead)
+- scp (uses a combination of ssh to connect and scp to transfer files)
+- rsync
+- sudoedit (implemented slightly more secure than the inline sudo method)
+- smb (for accessing files on Samba or MS Windows servers)
+- *ftp*
+
+The ability to access files via FTP is particularly useful in a web development setting. TRAMP uses an external FTP program to handle this.
+
+** Authentication
+When you're accessing files on other computers, you might want to think about how you'll be authenticating to these machines. In the case of SSH, you might have your public SSH key copied to another machine so you can login without entering your password (although you might be prompted for a passphrase if you have encrypted your private SSH key).
+
+But what about FTP, for example? TRAMP can use information stored in an encrypted file in your home directory to figure out which combination of user and password to use for a particular path. This file is generally stored in =~/.authinfo.gpg=. Emacs can transparently decrypt this file and look up credentials for particular machines. The general layout of this file is this:
+
+#+begin_src text
+  machine HOST#PORT port PROTOCOL login USERNAME%DOMAIN password SECRET
+#+end_src
+
+A quick tour through the parameters written in all-caps:
+
+- HOST#PORT :: You can of course omit the #PORT part and just specify a host, e.g. =example.com=.
+- PROTOCOL :: This can be any protocol supported by TRAMP as listed above, e.g. =ftp=.
+- USERNAME%DOMAIN :: Again, you can omit the domain part, particularly for protocols that don't care about domains, but for connecting to Samba / MS Windows servers, this might be important.
+- SECRET :: The password used to authenticate the given USER on the other machine.
+
+Here's a quick example storing credentials for user "test1" on the FTP server "mymachine.org":
+
+#+begin_src text
+  machine mymachine.org port ftp login test1 password hunter3
+#+end_src
+
+If TRAMP can't find a particular combination of hostname and username in your authinfo file, it will prompt for a password interactively.
+
+There are two variables we need to customize in order to properly use =~/.authinfo.gpg= as the path to our encrypted authentication file. =auth-sources= stores a list of files TRAMP may consult to obtain credentials. For FTP, since work is offloaded to the Ange FTP package, an additional setting in =ange-ftp-netrc-filename= is required, pointing to the same path.
+
+#+begin_src emacs-lisp
+  (customize-set-variable 'auth-sources '("~/.authinfo.gpg"))
+  (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
+#+end_src
+
 * Rest of the configuration (for now)
 
 #+begin_src emacs-lisp
-  ;; Don't save customizations in this init file. The custom-file will
-  ;; be loaded at the end
-
-
-
-  ;; Authentication sources
-  (setq auth-sources '("~/.authinfo.gpg"))
-  (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
-
-  ;; Initialize package system
-
-
-  ;; Enable ligatures from 
-
   ;; doom-modeline
   (use-package doom-modeline
     :init
@@ -271,7 +338,14 @@ Here is a screenshot of the init.el file in this repository, rendered in the Dra
     :config
     (setq org-ellipsis " ▾")
     (eh/org-font-setup)
-    (setq org-agenda-files '("~/org")))
+    (setq org-agenda-files '("~/org"))
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (latex . t)
+       (ledger . t)
+       (python . t)
+       (shell . t))))
 
   (use-package org-bullets
     :after org
