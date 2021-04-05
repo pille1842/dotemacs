@@ -4,6 +4,8 @@
 #+OPTIONS: toc:nil
 #+MACRO: export-date (eval (format-time-string "%F %R %z" (current-time)))
 #+MACRO: emacs-development-version (eval (substring (emacs-version) 0 14))
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+HTML_HEAD: <style>pre.src{background:#343131;color:white;} </style>
 
 - Created: 2021-03-31.
 - Updated: *{{{export-date}}}*.
@@ -146,7 +148,7 @@ TRAMP stands for "Transparent Remote (file) Access, Multiple Protocol". This pac
 
 TRAMP is called "transparent" because it handles all the "remote" parts of accessing a particular file. To the rest of Emacs, a file accessed through TRAMP looks just like any other file. Here's an example: To edit a file =/path/to/file.txt= on a machine accessible through SSH, e.g. on =remotehost=, you simply type the following command:
 
-#+begin_src text
+#+begin_src text :tangle no
   C-x C-f /remotehost:/path/to/file.txt RET
 #+end_src
 
@@ -165,7 +167,7 @@ TRAMP can also be used with other protocols than SSH or SCP. Some of these are c
 
 The sudo method is particularly interesting since it allows you to edit files only accessible as root directly in your current Emacs session, without starting Emacs as root or hopping into a terminal. To edit the contents of =/etc/passwd=, simply type:
 
-#+begin_src text
+#+begin_src text :tangle no
   C-x C-f /sudo::/etc/passwd RET
 #+end_src
 
@@ -173,7 +175,7 @@ TRAMP will prompt you for the password of =root@yourhost=, possibly right after 
 
 Another thing to note are the two colons after "sudo". Why two? Well, the generic syntax for TRAMP paths is:
 
-#+begin_src text
+#+begin_src text :tangle no
   /method:user@host:/path/to/file
 #+end_src
 
@@ -196,7 +198,7 @@ When you're accessing files on other computers, you might want to think about ho
 
 But what about FTP, for example? TRAMP can use information stored in an encrypted file in your home directory to figure out which combination of user and password to use for a particular path. This file is generally stored in =~/.authinfo.gpg=. Emacs can transparently decrypt this file and look up credentials for particular machines. The general layout of this file is this:
 
-#+begin_src text
+#+begin_src text :tangle no
   machine HOST#PORT port PROTOCOL login USERNAME%DOMAIN password SECRET
 #+end_src
 
@@ -209,7 +211,7 @@ A quick tour through the parameters written in all-caps:
 
 Here's a quick example storing credentials for user "test1" on the FTP server "mymachine.org":
 
-#+begin_src text
+#+begin_src text :tangle no
   machine mymachine.org port ftp login test1 password hunter3
 #+end_src
 
@@ -220,6 +222,31 @@ There are two variables we need to customize in order to properly use =~/.authin
 #+begin_src emacs-lisp
   (customize-set-variable 'auth-sources '("~/.authinfo.gpg"))
   (customize-set-variable 'ange-ftp-netrc-filename "~/.authinfo.gpg")
+#+end_src
+
+* Auto-exporting this configuration
+When saving this file, it will be automatically exported as =erix-emacs.html= and uploaded to my website.
+
+This depends on the value of =erix-emacs-config-html-target= being correctly set to the FTP target path (see the section on [[*Networking and TRAMP][Networking and TRAMP]]). This will be done in =private.el=, a file loaded right before =custom.el=, but not checked into the repository for security reasons.
+
+#+begin_src emacs-lisp
+  (defcustom erix-emacs-config-html-target nil
+    "Location where erix-emacs.html will be copied after exporting it.")
+
+  (defun erix-export-emacs-config ()
+    "When the current buffer is the Emacs configuration file
+  erix-emacs.org, export it as an HTML file and upload it to a
+  location designated by `erix-emacs-config-html-target'."
+    (when (string= (erix-emacs--expand-file-name erix-emacs-configuration-main-file
+                                                 ".org")
+                   (buffer-file-name))
+      (org-html-export-to-html)
+      (when erix-emacs-config-html-target
+        (copy-file (expand-file-name "erix-emacs.html" user-emacs-directory)
+                   erix-emacs-config-html-target
+                   t))))
+
+  (add-hook 'after-save-hook #'erix-export-emacs-config)
 #+end_src
 
 * Rest of the configuration (for now)
@@ -430,6 +457,15 @@ There are two variables we need to customize in order to properly use =~/.authin
   (global-set-key (kbd "<pause>")
                   'save-buffer)
 
+#+end_src
+
+* Load the private file
+Some settings are better not kept under public version control. For this purpose, a "private file" called =~/.emacs.d/private.el= can be used, which will be loaded at this point.
+
+#+begin_src emacs-lisp
+  (let ((private-file (expand-file-name "private.el" user-emacs-directory)))
+    (when (file-exists-p private-file)
+      (load private-file)))
 #+end_src
 
 * Load the custom file

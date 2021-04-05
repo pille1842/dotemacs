@@ -8,5 +8,7 @@ elpa/*
 erix-emacs.el*
 forge-database.sqlite
 lsp-cache/
+private.el
 projectile-bookmarks.eld
+tramp
 transient/
