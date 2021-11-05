@@ -90,6 +90,14 @@
 ;; Configure searching
 (use-package swiper)
 
+;; Alternatives to some built-in commands
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . counsel-minibuffer-history)))
+
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
@@ -107,6 +115,21 @@
 	 ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
+
+;; Make Ivy displays more helpful
+(use-package ivy-rich
+  :init (ivy-rich-mode 1))
+
+;; More helpful help functions
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 
 ;; Configure the modeline
 (use-package doom-modeline
