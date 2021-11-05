@@ -70,6 +70,22 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;; Load my favorite theme
+(use-package dracula-theme
+  :init (load-theme 'dracula t))
+
+;; Show column numbers in the modeline
+(column-number-mode 1)
+
+;; Show line numbers...
+(global-display-line-numbers-mode 1)
+
+;; ... but not in some major modes
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode -1))))
+
 ;; Configure searching
 (use-package swiper)
 
