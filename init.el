@@ -117,4 +117,9 @@
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;; Show which keybindings are available
+(use-package which-key
+  :init (which-key-mode)
+  :custom ((which-key-idle-delay 0.3)))
+
 ;;; init.el ends here
