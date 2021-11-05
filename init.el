@@ -83,7 +83,8 @@
 ;; ... but not in some major modes
 (dolist (mode '(org-mode-hook
 		term-mode-hook
-		eshell-mode-hook))
+		eshell-mode-hook
+		shell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode -1))))
 
 ;; Configure searching
