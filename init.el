@@ -113,4 +113,8 @@
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 30)))
 
+;; More colorful parentheses
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
 ;;; init.el ends here
