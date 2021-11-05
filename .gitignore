@@ -1,11 +1,9 @@
-*.html
 *~
 .cache/
 .lsp-session-*
 .org-id-locations
 auto-save-list/
 elpa/*
-erix-emacs.el*
 forge-database.sqlite
 lsp-cache/
 private.el
