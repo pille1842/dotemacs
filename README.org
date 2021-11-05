@@ -1,0 +1,6 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Eric Haberstroh
+#+EMAIL: gpg@erixpage.de
+#+DATE: [2021-11-05 Fr]
+
+This is my Emacs configuration.
