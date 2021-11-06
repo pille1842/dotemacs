@@ -71,8 +71,8 @@
 (setq use-package-always-ensure t)
 
 ;; Load my favorite theme
-(use-package dracula-theme
-  :init (load-theme 'dracula t))
+(use-package doom-themes
+  :init (load-theme 'doom-dracula t))
 
 ;; Show column numbers in the modeline
 (column-number-mode 1)
@@ -116,6 +116,8 @@
   :config
   (ivy-mode 1))
 
+(global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
+
 ;; Make Ivy displays more helpful
 (use-package ivy-rich
   :init (ivy-rich-mode 1))
@@ -144,5 +146,79 @@
 (use-package which-key
   :init (which-key-mode)
   :custom ((which-key-idle-delay 0.3)))
+
+;; Pretty icons
+(use-package all-the-icons
+  :if (display-graphic-p)
+  :commands all-the-icons-install-fonts
+  :init
+  (unless (find-font (font-spec :name "all-the-icons"))
+    (all-the-icons-install-fonts t)))
+
+(use-package all-the-icons-dired
+  :if (display-graphic-p)
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+;; More convenient keybindings
+(use-package general
+  :config
+  (general-create-definer ehmacs/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+
+  (ehmacs/leader-keys
+   "t"  '(:ignore t :which-key "toggles")
+   "tt" '(counsel-load-theme :which-key "choose theme")))
+
+(defun ehmacs/evil-hook ()
+  "Setup evil mode"
+  (dolist (mode '(custom-mode
+		  eshell-mode
+		  git-rebase-mode
+		  erc-mode
+		  circe-server-mode
+		  circe-chat-mode
+		  circe-query-mode
+		  sauron-mode
+		  term-mode))
+    (add-to-list 'evil-emacs-state-modes mode)))
+
+;; Become evil
+(use-package evil
+  :custom
+  (evil-want-integration t)
+  (evil-want-keybinding t)
+  (evil-want-C-u-scroll t)
+  (evil-want-C-i-jump nil)
+  :hook (evil-mode . ehmacs/evil-hook)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;; Many heads
+(use-package hydra)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+
+(ehmacs/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;;; init.el ends here
