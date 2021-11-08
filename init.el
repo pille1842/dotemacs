@@ -185,14 +185,16 @@
     (add-to-list 'evil-emacs-state-modes mode)))
 
 ;; Become evil
+
+(setq org-want-keybinding nil)
+
 (use-package evil
   :custom
   (evil-want-integration t)
-  (evil-want-keybinding t)
   (evil-want-C-u-scroll t)
   (evil-want-C-i-jump nil)
   :hook (evil-mode . ehmacs/evil-hook)
-  :config
+  :init
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
@@ -243,7 +245,66 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+;; For this to work: https://magit.vc/manual/ghub.html#Creating-and-Storing-a-Token
 (use-package forge
   :after magit)
+
+;; Orgmode
+
+(defun ehmacs/org-mode-setup ()
+  "Various set up tasks for Orgmode"
+  (org-indent-mode 1)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
+
+(use-package org
+  :ensure org-plus-contrib
+  :hook (org-mode . ehmacs/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▼"
+	org-hide-emphasis-markers nil))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode))
+
+(font-lock-add-keywords 'org-mode
+			'(("^ *\\([-]\\) "
+			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "·"))))))
+
+(with-eval-after-load 'org-faces
+  (dolist (face '((org-level-1 . 1.2)
+		  (org-level-2 . 1.1)
+		  (org-level-3 . 1.05)
+		  (org-level-4 . 1.0)
+		  (org-level-5 . 1.1)
+		  (org-level-6 . 1.1)
+		  (org-level-7 . 1.1)
+		  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
+
+(require 'org-indent)
+
+(with-eval-after-load 'org-faces
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch))
+
+(defun ehmacs/org-mode-visual-fill ()
+  "Set up visual-fill-mode for Orgmode buffers"
+  (setq visual-fill-column-width 100
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :defer t
+  :hook (org-mode . ehmacs/org-mode-visual-fill))
 
 ;;; init.el ends here
