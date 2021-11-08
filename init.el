@@ -262,9 +262,102 @@
 (use-package org
   :ensure org-plus-contrib
   :hook (org-mode . ehmacs/org-mode-setup)
+  :custom
+  (org-agenda-files '("~/org"))
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+     (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+  (org-agenda-custom-commands
+   '(("d" "Dashboard"
+      ((agenda "" ((org-deadline-warning-days 7)))
+       (todo "NEXT"
+             ((org-agenda-overriding-header "Next Tasks")))
+       (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+
+     ("n" "Next Tasks"
+      ((todo "NEXT"
+             ((org-agenda-overriding-header "Next Tasks")))))
+
+     ("W" "Work Tasks" tags-todo "+work-email")
+
+     ;; Low-effort next actions
+     ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+      ((org-agenda-overriding-header "Low Effort Tasks")
+       (org-agenda-max-todos 20)
+       (org-agenda-files org-agenda-files)))
+
+     ("w" "Workflow Status"
+      ((todo "WAIT"
+             ((org-agenda-overriding-header "Waiting on External")
+              (org-agenda-files org-agenda-files)))
+       (todo "REVIEW"
+             ((org-agenda-overriding-header "In Review")
+              (org-agenda-files org-agenda-files)))
+       (todo "PLAN"
+             ((org-agenda-overriding-header "In Planning")
+              (org-agenda-todo-list-sublevels nil)
+              (org-agenda-files org-agenda-files)))
+       (todo "BACKLOG"
+             ((org-agenda-overriding-header "Project Backlog")
+              (org-agenda-todo-list-sublevels nil)
+              (org-agenda-files org-agenda-files)))
+       (todo "READY"
+             ((org-agenda-overriding-header "Ready for Work")
+              (org-agenda-files org-agenda-files)))
+       (todo "ACTIVE"
+             ((org-agenda-overriding-header "Active Projects")
+              (org-agenda-files org-agenda-files)))
+       (todo "COMPLETED"
+             ((org-agenda-overriding-header "Completed Projects")
+              (org-agenda-files org-agenda-files)))
+       (todo "CANC"
+             ((org-agenda-overriding-header "Cancelled Projects")
+              (org-agenda-files org-agenda-files)))))))
+  (org-tag-alist
+   '((:startgroup)
+     ;; Put mutually exclusive tags here
+     (:endgroup)
+     ("@errand" . ?E)
+     ("@home" . ?H)
+     ("@work" . ?W)
+     ("pvt" . ?t)
+     ("pvg" . ?g)
+     ("pvf" . ?f)
+     ("pkb" . ?b)
+     ("jet" . ?j)))
+  (org-refile-targets
+   '(("Archiv.org" :maxlevel . 2)
+     ("Aufgaben.org" :maxlevel . 1)))
+  (org-capture-templates
+   '(("t" "Tasks / Projects")
+     ("tt" "Task" entry (file+olp "~/org/Aufgaben.org" "Eingang")
+      "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+     ("ts" "Clocked Entry Subtask" entry (clock)
+      "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+
+     ("j" "Journal Entries")
+     ("jj" "Journal" entry
+      (file+olp+datetree "~/org/Tagebuch.org")
+      "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
+     ("jm" "Meeting" entry
+      (file+olp+datetree "~/org/Tagebuch.org")
+      "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+      :clock-in :clock-resume
+      :empty-lines 1)
+     ("m" "Metrics Capture")
+     ("mw" "Weight" table-line (file+headline "~/org/Metrik.org" "Gewicht")
+      "| %U | %^{Weight} | %^{Notizen} |" :kill-buffer t)))
+     
+  (org-agenda-start-with-log-mode t)
+  (org-log-done 'time)
+  (org-log-into-drawer t)
   :config
   (setq org-ellipsis " ▼"
-	org-hide-emphasis-markers nil))
+	org-hide-emphasis-markers nil)
+  ;; Save Org buffers after refiling
+  (advice-add 'org-refile :after 'org-save-all-org-buffers))
 
 (use-package org-bullets
   :after org
@@ -290,12 +383,15 @@
 (with-eval-after-load 'org-faces
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-drawer nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
-  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-document-info-keyword nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-todo nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
 
 (defun ehmacs/org-mode-visual-fill ()
   "Set up visual-fill-mode for Orgmode buffers"
