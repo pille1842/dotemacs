@@ -51,6 +51,9 @@
 	     :config
 	     (load-theme 'modus-vivendi :no-confirm))
 
+;; Start Emacs with a maximized frame. Reference: <https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/>
+(add-hook 'window-setup-hook 'toggle-frame-maximized t)
+
 ;; -------- FONTS --------
 
 ;; Load fontaine package and configure fonts
