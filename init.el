@@ -58,6 +58,13 @@
 (column-number-mode 1)
 (global-display-line-numbers-mode 1)
 
+;; Enable a tree view of the current project or folder, similiar to VS Code's interface
+(use-package treemacs
+  :straight
+  (treemacs :type git :host github :repo "Alexander-Miller/treemacs")
+  :bind
+  (("C-c t" . treemacs)))
+
 ;; -------- FONTS --------
 
 ;; Load fontaine package and configure fonts
