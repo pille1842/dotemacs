@@ -46,10 +46,10 @@
 
 ;; Load modus-vivendi theme
 (use-package modus-themes
-	     :straight
-	     (modus-themes :type git :host github :repo "protesilaos/modus-themes")
-	     :config
-	     (load-theme 'modus-vivendi :no-confirm))
+  :straight
+  (modus-themes :type git :host github :repo "protesilaos/modus-themes")
+  :config
+  (load-theme 'modus-vivendi :no-confirm))
 
 ;; Start Emacs with a maximized frame. Reference: <https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/>
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
