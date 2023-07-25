@@ -56,4 +56,5 @@ flycheck_*.el
 
 /eln-cache/
 /straight/
+/transient/
 *~
