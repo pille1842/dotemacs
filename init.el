@@ -121,4 +121,13 @@
   :config
   (setq magit-define-global-key-bindings 'default))
 
+;; -------- SESSION AND AUTHENTICATION MANAGEMENT --------
+
+;; Set up Emacs to use any running Keychain instances for management of SSH and GPG keys
+(use-package keychain-environment
+  :straight
+  (keychain-environment :type git :host github :repo "tarsius/keychain-environment")
+  :config
+  (keychain-refresh-environment))
+
 ;;; init.el ends here
