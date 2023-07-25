@@ -54,6 +54,10 @@
 ;; Start Emacs with a maximized frame. Reference: <https://emacsredux.com/blog/2020/12/04/maximize-the-emacs-frame-on-startup/>
 (add-hook 'window-setup-hook 'toggle-frame-maximized t)
 
+;; Show line numbers and column numbers everywhere
+(column-number-mode 1)
+(global-display-line-numbers-mode 1)
+
 ;; -------- FONTS --------
 
 ;; Load fontaine package and configure fonts
