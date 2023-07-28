@@ -130,4 +130,16 @@
   :config
   (keychain-refresh-environment))
 
+;; -------- MISCELLANEOUS BITS AND PIECES --------
+
+;; Set an initial scratch buffer message (undone by sensible-defaults/quiet-startup)
+(setq initial-scratch-message
+      (concat "Welcome "
+	      (user-login-name)
+	      " to GNU Emacs "
+	      emacs-version
+	      " on "
+	      system-name
+	      "!\n\n"))
+
 ;;; init.el ends here
