@@ -112,6 +112,15 @@
   (sensible-defaults/bind-home-and-end-keys)
   (sensible-defaults/bind-keys-to-change-text-size))
 
+;; -------- COMPLETION --------
+
+;; Install Vertico
+(use-package vertico
+  :straight
+  (vertico :type git :host github :repo "minad/vertico")
+  :init
+  (vertico-mode))
+
 ;; -------- VERSION CONTROL --------
 
 ;; Install Magit
