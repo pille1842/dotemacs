@@ -130,6 +130,16 @@
   :config
   (setq magit-define-global-key-bindings 'default))
 
+;; -------- PROJECT MANAGEMENT --------
+
+;; Install Projectile
+(use-package projectile
+  :straight
+  (projectile :type git :host github :repo "bbatsov/projectile")
+  :bind
+  (:map projectile-mode-map
+	("C-c p" . projectile-command-map)))
+
 ;; -------- SESSION AND AUTHENTICATION MANAGEMENT --------
 
 ;; Set up Emacs to use any running Keychain instances for management of SSH and GPG keys
