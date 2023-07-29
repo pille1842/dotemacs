@@ -146,6 +146,49 @@
   (:map projectile-mode-map
 	("C-c p" . projectile-command-map)))
 
+;; -------- ORG MODE --------
+
+;; Install Orgmode
+(use-package org
+  :straight
+  (:type built-in)
+  :bind
+  (("C-c l" . org-store-link)
+   ("C-c a" . org-agenda)
+   ("C-c c" . org-capture))
+  :config
+  (setq org-agenda-files
+	'("~/Org/gtd/inbox.org" "~/Org/gtd/gtd.org" "~/Org/gtd/tickler.org")
+	org-capture-templates
+	'(("t" "Todo [inbox]" entry (file+headline "~/Org/gtd/inbox.org" "Aufgaben")
+	   "* TODO %i%?")
+	  ("T" "Tickler" entry (file+headline "~/Org/gtd/tickler.org" "Tickler")
+	   "* %i%? \n %U"))
+	org-refile-targets
+	'(("~/Org/gtd/gtd.org" :maxlevel . 3)
+	  ("~/Org/gtd/someday.org" :level . 1)
+	  ("~/Org/gtd/tickler.org" :maxlevel . 2))
+	org-todo-keywords
+	'((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)"))
+	org-agenda-custom-commands
+	'(("z" "Zuhause" tags-todo "@zuhause"
+	   ((org-agenda-overriding-header "Zuhause")))
+	  ("A" "Amt" tags-todo "@amt"
+	   ((org-agenda-overriding-header "Amt")))
+	  ("v" "Verbindung" tags-todo "@verbindung"
+	   ((org-agenda-overriding-header "Verbindung")))
+	  ("p" "Telefon" tags-todo "@telefon"
+	   ((org-agenda-overriding-header "Telefon")))
+	  ("E" "E-Mail" tags-todo "@email"
+	   ((org-agenda-overriding-header "E-Mail")))
+	  ("l" "Erledigung" tags-todo "@erledigung"
+	   ((org-agenda-overriding-header "Erledigung"))))))
+
+;; Install org-contrib. Reference: <https://list.orgmode.org/878s4a8ull.fsf@gmail.com/T/>
+(use-package org-contrib
+  :straight
+  (org-contrib :type git :repo "https://git.sr.ht/~bzg/org-contrib" :local-repo "org-contrib"))
+
 ;; -------- SESSION AND AUTHENTICATION MANAGEMENT --------
 
 ;; Set up Emacs to use any running Keychain instances for management of SSH and GPG keys
