@@ -68,6 +68,9 @@
 ;; Integrate Treemacs with Projectile
 (use-package treemacs-projectile)
 
+;; Turn off the bell
+(setq ring-bell-function #'ignore)
+
 ;; -------- FONTS --------
 
 ;; Load fontaine package and configure fonts
