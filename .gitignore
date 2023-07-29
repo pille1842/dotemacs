@@ -60,3 +60,5 @@ flycheck_*.el
 /.cache/
 *~
 /projectile-bookmarks.eld
+/bookmarks
+/projectile.cache
