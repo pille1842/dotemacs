@@ -65,6 +65,9 @@
   :bind
   (("C-c t" . treemacs)))
 
+;; Integrate Treemacs with Projectile
+(use-package treemacs-projectile)
+
 ;; -------- FONTS --------
 
 ;; Load fontaine package and configure fonts
