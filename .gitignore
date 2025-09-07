@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Created by https://www.toptal.com/developers/gitignore/api/emacs
 # Edit at https://www.toptal.com/developers/gitignore?templates=emacs
 
@@ -8,6 +9,29 @@
 /.emacs.desktop
 /.emacs.desktop.lock
 *.elc
+=======
+# Created by https://www.toptal.com/developers/gitignore/api/macos,emacs,elisp
+# Edit at https://www.toptal.com/developers/gitignore?templates=macos,emacs,elisp
+
+### Elisp ###
+# Compiled
+*.elc
+
+# Packaging
+.cask
+
+# Backup files
+*~
+
+# Undo-tree save-files
+*.~undo-tree
+
+### Emacs ###
+# -*- mode: gitignore; -*-
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+>>>>>>> e3da9eb (Add a gitignore file)
 auto-save-list
 tramp
 .\#*
@@ -52,6 +76,7 @@ flycheck_*.el
 /network-security.data
 
 
+<<<<<<< HEAD
 # End of https://www.toptal.com/developers/gitignore/api/emacs
 
 /eln-cache/
@@ -62,3 +87,54 @@ flycheck_*.el
 /projectile-bookmarks.eld
 /bookmarks
 /projectile.cache
+=======
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+### macOS Patch ###
+# iCloud generated files
+*.icloud
+
+# End of https://www.toptal.com/developers/gitignore/api/macos,emacs,elisp
+
+### Custom ###
+
+# backup files
+/backup/
+
+# native-compiled files
+*.eln
+*.eln.tmp
+
+# Babel-compiled version of config.org
+/config.el
+
+# file created by the Emacs customization system
+/custom.el
+>>>>>>> e3da9eb (Add a gitignore file)
