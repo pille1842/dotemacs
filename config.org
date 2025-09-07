@@ -321,8 +321,8 @@ Mit =C-c a= möchte ich die anstehenden Aufgaben und Termine sehen. Dazu lege ic
 ** DONE Org-Dateien mit Truncate-Lines öffnen
 ** DONE Org Agenda konfigurieren
 ** DONE Completion Framework konfigurieren (MEVOC = Marginalia + Embark + Vertico + Orderless + Consult)
-** TODO Magit konfigurieren
+** DONE Magit konfigurieren
 ** DONE Backups konfigurieren
-** TODO Emacs-Konfiguration in Git-Repository einchecken
+** DONE Emacs-Konfiguration in Git-Repository einchecken
 ** DONE Custom-System ausschalten (custom-file => /dev/null)
 ** DONE Protesilaos: Iosevka Comfy als Schriftart nutzen
