@@ -300,13 +300,48 @@ Mit [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook #'visual-line-mode)
 #+END_SRC
-** Org Agenda konfigurieren
+** Links in Org-Dateien mit RET folgen
+Wenn ich den Cursor über einem Link habe, möchte ich, dass RET den Link öffnet.
+
+#+begin_src emacs-lisp
+  (setq org-return-follows-link t)
+#+end_src
+** Leere Zeile vor neuen Überschriften
+Standardmäßig fügt Orgmode vor dem Einfügen neuer Überschriften keine Leerzeile ein.
+
+#+begin_src emacs-lisp
+  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
+#+end_src
+** Notizverzeichnis für Org
+Meine Orgmode-Dateien liegen alle im Verzeichnis =~/Org=.
+
+#+begin_src emacs-lisp
+  (setq my-org-directory (expand-file-name "~/Org"))
+#+end_src
+** Org Agenda
 Mit =C-c a= möchte ich die anstehenden Aufgaben und Termine sehen. Dazu lege ich zunächst diese Tastenkombination fest (siehe [[https://orgmode.org/manual/Activation.html][Org-Handbuch]]) und konfiguriere dann den Ordner, der meine Org-Dateien enthält (siehe [[https://orgmode.org/manual/Agenda-Files.html][Org-Handbuch]]).
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c a") #'org-agenda)
-  (setq org-agenda-files '("~/Org"))
+  (setq org-agenda-files (list my-org-directory))
 #+END_SRC
+** Org Capture
+Mit =C-c c= möchte ich [[https://orgmode.org/manual/Capture.html][Org Capture]] aufrufen. Standardmäßig sollen Notizen in =~/Org/index.org= landen.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-c c") #'org-capture)
+  (setq org-default-notes-file (expand-file-name "index.org" my-org-directory))
+#+end_src
+
+Im Folgenden werden die Templates konfiguriert, die ich nutze.
+
+#+begin_src emacs-lisp
+    (setq org-capture-templates
+          '(("j" "Journal" entry (file+olp+datetree "~/Org/journal.org")
+             "* %U\n\n  %i%?")
+            ("t" "Todo" entry (file+headline "~/Org/todo.org" "Aufgaben")
+             "* TODO %?\n  %i\n  %a")))
+#+end_src
 * Magit
 [[https://magit.vc][Magit]] ist eine Git-Oberfläche für Emacs.
 

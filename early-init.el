@@ -53,7 +53,7 @@
 
 ;;; Code:
 
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(add-to-list 'initial-frame-alist '(fullboth . fullboth))
 (setenv "LIBRARY_PATH" "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
 
 ;;; early-init.el ends here
