@@ -293,6 +293,20 @@ Die [[https://github.com/protesilaos/ef-themes][ef-themes]] sind eine Sammlung s
     :config
     (ef-themes-select 'ef-light))
 #+END_SRC
+** Regeln für Fenster
+In der =display-buffer-alist= können Regeln für die Erstellung von Fenstern hinterlegt werden.
+*** Occur-Fenster immer unterhalb des aufrufenden Fensters
+Mit =M-s o= kann Occur aufgerufen werden, um alle Zeilen im aktuellen Buffer zu suchen, die einen bestimmten Ausdruck enthalten. Dieses Fenster soll standardmäßig unterhalb des Fensters erzeugt werden, von dem aus es aufgerufen wird, und nur so viel Platz beanspruchen, wie benötigt wird. Das Occur-Fenster soll außerdem nur für Occur verwendet werden ("dedicated").
+
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+               '("\\*Occur\\*"
+                 (display-buffer-reuse-window
+                  display-buffer-below-selected)
+                 (window-height . fit-window-to-buffer)
+                 (post-command-select-window . t)
+                 (dedicated . t)))
+#+end_src
 * Orgmode
 ** Beim Laden von Org-Dateien den Visual Line Mode aktivieren
 Mit [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][Visual Line Mode]] werden Wörter in langen Zeilen umgebrochen. Dies ist für Org-Dateien meine gewünschte Voreinstellung.
