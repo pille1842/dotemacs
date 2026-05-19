@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ;;; early-init.el --- Early Startup File for Emacs Configuration of Eric Haberstroh -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 Eric Haberstroh <eric@erichaberstroh.de>
@@ -21,3 +22,7 @@
 (setq package-enable-at-startup nil)
 
 ;;; early-init.el ends here
+=======
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+(setenv "LIBRARY_PATH" "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
+>>>>>>> 69277aa (Initial commit)

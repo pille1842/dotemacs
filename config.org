@@ -1,0 +1,326 @@
+#+TITLE: Meine Emacs-Konfiguration
+#+AUTHOR: Eric Haberstroh
+#+EMAIL: eric@erichaberstroh.de
+#+OPTIONS: num:nil
+#+STARTUP: content
+Dies ist meine Emacs-Konfiguration. Ich speichere diese in einer [[https://www.orgmode.org/][Org-Datei]] ([[https://de.wikipedia.org/wiki/Literate_Programming][Literate Programming]]), die von meiner =init.el= über [[https://orgmode.org/worg/org-contrib/babel/][Babel]] geladen wird. Das grundsätzliche Setup habe ich aus einem [[https://ryan.himmelwright.net/post/org-babel-setup/][Blog-Post von Ryan Himmelwright]] übernommen.
+
+* Customization-System
+Ich verwende das Emacs Customization-System nicht. Ich möchte nicht, dass durch Mausklicks oder Tastaturbefehle meine =init.el= um hässliche Befehle erweitert wird. Die gesamte Konfiguration von Emacs soll in dieser Datei (=config.org=) stattfinden. Deshalb schalte ich das Customization-System aus.
+
+Ich würde gerne die Variable =custom-file= auf =/dev/null=. Dadurch würden Änderungen durch das Customization-System einfach ins Nirwana geschrieben. Leider verursacht das jedoch in Emacs 30.2 einen lästigen Bug, durch den sich keine Pakete mehr installieren lassen (siehe [[https://lists.gnu.org/archive/html/bug-gnu-emacs/2025-08/msg01318.html][diese Nachricht auf der Emacs-Mailingliste]]).
+
+Deshalb setze ich =custom-file= auf =~/.emacs.d/custom.el=, lade diese Datei aber niemals.
+
+#+BEGIN_SRC emacs-lisp
+  (setopt custom-file (expand-file-name "custom.el" user-emacs-directory))
+#+END_SRC
+
+* Paketverwaltung
+** Paketverwaltung initialisieren
+In =init.el= wird bereits [[https://melpa.org/#/][Milkypostman's Emacs Lisp Package Archive]] zu den Paketarchiven hinzugefügt, da anschließend das Paketsystem initialisiert werden muss, um =config.org= mit Babel laden zu können.
+
+Nun muss noch sichergestellt werden, dass ein Cache der Paketliste vorliegt.
+
+#+BEGIN_SRC emacs-lisp
+  (unless package-archive-contents
+    (package-refresh-contents))
+#+END_SRC
+* Grundeinstellungen
+** Sicherungsdateien durch Kopieren in einen zentralen Ordner erstellen
+Emacs kann beim Speichern von Dateien Sicherungskopien (Backups) auf verschiedene Arten erstellen:
+
+1. **Umbenennen** -- die Originaldatei wird zur Sicherungskopie umbenannt und der neue Dateiinhalt wird in einer neuen Datei geschrieben. Nachteil: Hard Links auf die Originaldatei zeigen nun auf die Sicherungskopie.
+2. **Kopieren** -- die Originaldatei wird zur Sicherungskopie kopiert und der neue Dateiinhalt wird in die originale Datei geschrieben. Nachteil: Dies ist die langsamste Methode, da effektiv bei jedem Speichervorgang zwei Dateien geschrieben werden müssen.
+3. Verschiedene Varianten des bedingten Kopierens -- prüft zunächst Bedingungen wie "Hat die Datei mehrere Namen" oder "Wie beeinflusst das Verschieben die Eigentümer- und Gruppenberechtigungen", bevor entschieden wird, ob Verschieben ausreicht oder das Backup durch Kopieren erstellt werden muss.
+
+Geschwindigkeit ist nicht das Wichtigste, sondern Sicherheit. Deshalb sollen Sicherungskopien immer durch Kopieren der Originaldatei erstellt werden.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-by-copying t)
+#+END_SRC
+
+Die Sicherungskopien werden standardmäßig mit dem Suffix =~= in demselben Ordner erstellt wie die Originaldatei. Dadurch wird das Dateisystem unnötig zugemüllt. Ich möchte, dass alle Sicherungskopien in einem zentralen Verzeichnis gespeichert werden.
+
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+#+END_SRC
+** Dateien immer mit einem Zeilenumbruch am Ende speichern
+Am Ende jeder Datei soll ein Zeilenumbruch stehen.
+
+#+BEGIN_SRC emacs-lisp
+  (setq require-final-newline t)
+#+END_SRC
+** Tabulatoren vermeiden
+Ich möchte immer mit Leerzeichen einrücken, niemals mit Tabulatorzeichen.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default indent-tabs-mode nil)
+#+END_SRC
+** In Quellcode-Dateien Zeilennummern anzeigen
+Wenn ich programmiere, sind Zeilennummern relevant. Ansonsten brauche ich sie nicht.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+#+END_SRC
+** Tastenkombinationsvorschläge anzeigen
+Der mittlerweile in Emacs inkludierte [[https://elpa.gnu.org/packages/which-key.html][Which-Key-Mode]] zeigt Vorschläge für Tastenkombinationen an, die den bereits gedrückten Tasten folgen können.
+
+#+BEGIN_SRC emacs-lisp
+  (which-key-mode)
+#+END_SRC
+* Betriebssystemspezifika
+** MacOS-Tasten Control, Option und Command konfigurieren
+Die folgenden Variablen legen das Verhalten der MacOS-spezifischen Tasten Control, Option und Command fest. Folgende Konfiguration wünsche ich mir:
+
+- Command soll als Ctrl fungieren.
+- Die linke Option-Taste soll als Meta-Taste fungieren.
+- Über die rechte Option-Taste sollen Sonderzeichen wie @ und € eingegeben werden können.
+
+Im [[https://www.emacswiki.org/emacs/EmacsForMacOS#h5o-32][EmacsWiki]] wird beschrieben, über welche Variablen auf MacOS die Belegung der plattformspezifischen Tasten erfolgt. Dies sind:
+
+- =mac-function-modifier= (linke Fn-Taste)
+- =mac-control-modifier= (linke Control-Taste)
+- =mac-command-modifier= (linke Command-Taste)
+- =mac-option-modifier= (linke Option-Taste)
+- =mac-right-command-modifier= (rechte Command-Taste)
+- =mac-right-control-modifier= (rechte Control-Taste; auf meinem MacBook nicht vorhanden!)
+- =mac-right-option-modifier= (rechte Option-Taste)
+
+Mögliche Werte für jede der Variablen sind: =control=, =meta=, =alt=, =super=, =hyper= und =none=.
+
+Die beiden Command-Tasten müssen also auf =control= gesetzt, die linke Option-Taste als =meta= definiert und die rechte Option-Taste komplett deaktiviert (=none=) werden, damit das System die Eingabe von Sonderzeichen übernimmt, statt die Taste an Emacs weiterzugeben.
+
+#+BEGIN_SRC emacs-lisp
+  (when (eq system-type 'darwin)
+    (setq mac-command-modifier 'control
+  	mac-right-command-modifier 'control
+  	mac-option-modifier 'meta
+  	mac-right-option-modifier 'none))
+#+END_SRC
+* Completion Framework -- MEVOC
+Als Completion Framework nutze ich **MEVOC** -- Marginalia, Embark, Vertico, Orderless und Consult.
+** Marginalia
+[[https://github.com/minad/marginalia][Marginalia]] fügt den Vorschlägen im Minibuffer nützliche Randbemerkungen hinzu.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package marginalia
+    :ensure t
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle))
+    :init
+    (marginalia-mode))
+#+END_SRC
+** Embark
+[[https://github.com/oantolin/embark][Embark]] ist wie ein tastaturbasiertes Kontextmenü für Dinge, auf denen sich der Cursor befindet. Mit =C-.= wird =embark-act= aufgerufen, um Embark zu aktivieren. Mit =M-;= wird =embark-dwim= aufgerufen ("do what I mean"). Mit =C-h B= wird ein Hilfetool für Tastenkombinationen angezeigt.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package embark
+    :ensure t
+    :bind
+    (("C-." . embark-act)
+     ("M-." . embark-dwim)
+     ("C-h B" . embark-bindings))
+    :init
+    (setq prefix-help-command #'embark-prefix-help-command))
+#+END_SRC
+
+Da ich auch Consult verwende, sollte =embark-consult= installiert werden.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package embark-consult
+    :ensure t)
+#+END_SRC
+** Vertico
+[[https://github.com/minad/vertico][Vertico]] (VERTical Interactive COmpletion) stellt eine simple vertikale Vervollständigungsoberfläche zur Verfügung.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package vertico
+    :ensure t
+    :init
+    (vertico-mode))
+#+END_SRC
+** Orderless
+[[https://github.com/oantolin/orderless][Orderless]] stellt einen "Completion Style" für das Emacs-Vervollständigungssystem zur Verfügung.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package orderless
+    :ensure t
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
+#+END_SRC
+** Consult
+[[https://github.com/minad/consult][Consult]] ersetzt zahlreiche Vervollständigungsbefehle durch bessere Varianten.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package consult
+    :ensure t
+    ;; Replace bindings. Lazily loaded by `use-package'.
+    :bind (;; C-c bindings in `mode-specific-map'
+           ("C-c M-x" . consult-mode-command)
+           ("C-c h" . consult-history)
+           ("C-c k" . consult-kmacro)
+           ("C-c m" . consult-man)
+           ("C-c i" . consult-info)
+           ([remap Info-search] . consult-info)
+           ;; C-x bindings in `ctl-x-map'
+           ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+           ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+           ("C-x t b" . consult-buffer-other-tab)    ;; orig. switch-to-buffer-other-tab
+           ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+           ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+           ("C-M-#" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+           ;; M-g bindings in `goto-map'
+           ("M-g e" . consult-compile-error)
+           ("M-g r" . consult-grep-match)
+           ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+           ("M-g g" . consult-goto-line)             ;; orig. goto-line
+           ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+           ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("M-g I" . consult-imenu-multi)
+           ;; M-s bindings in `search-map'
+           ("M-s d" . consult-find)                  ;; Alternative: consult-fd
+           ("M-s c" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s L" . consult-line-multi)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)
+           ;; Isearch integration
+           ("M-s e" . consult-isearch-history)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+           ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+           ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+           ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+           ;; Minibuffer history
+           :map minibuffer-local-map
+           ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+           ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+    ;; Enable automatic preview at point in the *Completions* buffer. This is
+    ;; relevant when you use the default completion UI.
+    :hook (completion-list-mode . consult-preview-at-point-mode)
+
+    ;; The :init configuration is always executed (Not lazy)
+    :init
+
+    ;; Tweak the register preview for `consult-register-load',
+    ;; `consult-register-store' and the built-in commands.  This improves the
+    ;; register formatting, adds thin separator lines, register sorting and hides
+    ;; the window mode line.
+    (advice-add #'register-preview :override #'consult-register-window)
+    (setq register-preview-delay 0.5)
+
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+          xref-show-definitions-function #'consult-xref)
+
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
+
+    ;; Optionally configure preview. The default value
+    ;; is 'any, such that any key triggers the preview.
+    ;; (setq consult-preview-key 'any)
+    ;; (setq consult-preview-key "M-.")
+    ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+    ;; For some commands and buffer sources it is useful to configure the
+    ;; :preview-key on a per-command basis using the `consult-customize' macro.
+    (consult-customize
+     consult-theme :preview-key '(:debounce 0.2 any)
+     consult-ripgrep consult-git-grep consult-grep consult-man
+     consult-bookmark consult-recent-file consult-xref
+     consult--source-bookmark consult--source-file-register
+     consult--source-recent-file consult--source-project-recent-file
+     ;; :preview-key "M-."
+     :preview-key '(:debounce 0.4 any))
+
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well.
+    (setq consult-narrow-key "<") ;; "C-+"
+
+    ;; Optionally make narrowing help available in the minibuffer.
+    ;; You may want to use `embark-prefix-help-command' or which-key instead.
+    ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
+    )
+#+END_SRC
+* Benutzeroberfläche
+** Emacs-Fenster maximiert starten
+Emacs soll den gesamten Bildschirm einnehmen, wenn ich ihn starte. Weitere Frames müssen jedoch nicht maximiert sein, wenn sie erstellt werden. In Frage kommt also die =initial-frame-alist=. Leider kann diese nur in der [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Early-Init-File.html][Early Init File]] beeinflusst werden, da die übrigen Init-Dateien gelesen werden, nachdem das erste Frame bereits erstellt worden ist.
+
+Die folgende Option hat hier also **keinen Effekt** und befindet sich stattdessen in =~/.emacs.d/early-init.el=.
+
+#+BEGIN_SRC emacs-lisp
+  ;;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+END_SRC
+** Menüleiste, Toolbar und Scrollbar ausblenden
+Ich möchte eine saubere Benutzeroberfläche ohne Knöpfe und Leisten, die ich ohnehin nicht verwende. Auf MacOS kann die Menüleiste eingeblendet bleiben, da sie ohnehin ins System integriert ist. Auf anderen Betriebssystemen soll sie ausgeblendet werden. Die Toolbar möchte ich nie sehen, ebenso wenig wie Scrollbalken.
+
+#+BEGIN_SRC emacs-lisp
+  (unless (eq system-type 'darwin)
+    (menu-bar-mode -1))
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+#+END_SRC
+** Schriftart und Schriftgröße einstellen
+Ich verwende [[https://github.com/protesilaos/iosevka-comfy][Iosevka Comfy]] in Schriftgröße 17.
+
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :font "Iosevka Comfy" :height 170)
+#+END_SRC
+** Themes von Protesilaos konfigurieren
+Die [[https://github.com/protesilaos/ef-themes][ef-themes]] sind eine Sammlung schöner Themes von Protesilaos Stavrou.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ef-themes
+    :ensure t
+    :config
+    (ef-themes-select 'ef-light))
+#+END_SRC
+* Orgmode
+** Beim Laden von Org-Dateien den Visual Line Mode aktivieren
+Mit [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][Visual Line Mode]] werden Wörter in langen Zeilen umgebrochen. Dies ist für Org-Dateien meine gewünschte Voreinstellung.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook #'visual-line-mode)
+#+END_SRC
+** Org Agenda konfigurieren
+Mit =C-c a= möchte ich die anstehenden Aufgaben und Termine sehen. Dazu lege ich zunächst diese Tastenkombination fest (siehe [[https://orgmode.org/manual/Activation.html][Org-Handbuch]]) und konfiguriere dann den Ordner, der meine Org-Dateien enthält (siehe [[https://orgmode.org/manual/Agenda-Files.html][Org-Handbuch]]).
+
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c a") #'org-agenda)
+  (setq org-agenda-files '("~/Org"))
+#+END_SRC
+* Magit
+[[https://magit.vc][Magit]] ist eine Git-Oberfläche für Emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :init
+    (setq magit-define-global-key-bindings 'recommended))
+#+END_SRC
+* Offene Aufgaben
+** DONE Schriftgrößen einstellen
+** DONE Org-Dateien mit Truncate-Lines öffnen
+** DONE Org Agenda konfigurieren
+** DONE Completion Framework konfigurieren (MEVOC = Marginalia + Embark + Vertico + Orderless + Consult)
+** TODO Magit konfigurieren
+** DONE Backups konfigurieren
+** TODO Emacs-Konfiguration in Git-Repository einchecken
+** DONE Custom-System ausschalten (custom-file => /dev/null)
+** DONE Protesilaos: Iosevka Comfy als Schriftart nutzen

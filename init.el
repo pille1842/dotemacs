@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ;;; init.el --- Emacs Configuration of Eric Haberstroh -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 Eric Haberstroh <eric@erichaberstroh.de>
@@ -211,3 +212,8 @@
 	      "!\n\n"))
 
 ;;; init.el ends here
+=======
+(package-initialize)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(org-babel-load-file (concat user-emacs-directory "config.org"))
+>>>>>>> 69277aa (Initial commit)
