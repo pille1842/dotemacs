@@ -100,8 +100,8 @@ Die beiden Command-Tasten müssen also auf =control= gesetzt, die linke Option-T
   	mac-option-modifier 'meta
   	mac-right-option-modifier 'none))
 #+END_SRC
-* Completion Framework -- MEVOC
-Als Completion Framework nutze ich **MEVOC** -- Marginalia, Embark, Vertico, Orderless und Consult.
+* Completion Framework -- MEVOC + Company
+Als Completion Framework nutze ich **MEVOC** -- Marginalia, Embark, Vertico, Orderless und Consult. Dazu nutze ich Company für Codevervollständigungen am Cursor.
 ** Marginalia
 [[https://github.com/minad/marginalia][Marginalia]] fügt den Vorschlägen im Minibuffer nützliche Randbemerkungen hinzu.
 
@@ -260,6 +260,14 @@ Da ich auch Consult verwende, sollte =embark-consult= installiert werden.
     ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
     )
 #+END_SRC
+** Company
+[[https://company-mode.github.io/][Company]] stellt klassische Vervollständigungen mit TAB und ein Auswahlmenü am Cursor zur Verfügung.
+#+begin_src emacs-lisp
+  (use-package company
+    :ensure t
+    :init
+    (global-company-mode))
+#+end_src
 * Benutzeroberfläche
 ** Emacs-Fenster maximiert starten
 Emacs soll den gesamten Bildschirm einnehmen, wenn ich ihn starte. Weitere Frames müssen jedoch nicht maximiert sein, wenn sie erstellt werden. In Frage kommt also die =initial-frame-alist=. Leider kann diese nur in der [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Early-Init-File.html][Early Init File]] beeinflusst werden, da die übrigen Init-Dateien gelesen werden, nachdem das erste Frame bereits erstellt worden ist.
