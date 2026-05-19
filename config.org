@@ -4,7 +4,6 @@
 #+OPTIONS: num:nil
 #+STARTUP: content
 Dies ist meine Emacs-Konfiguration. Ich speichere diese in einer [[https://www.orgmode.org/][Org-Datei]] ([[https://de.wikipedia.org/wiki/Literate_Programming][Literate Programming]]), die von meiner =init.el= über [[https://orgmode.org/worg/org-contrib/babel/][Babel]] geladen wird. Das grundsätzliche Setup habe ich aus einem [[https://ryan.himmelwright.net/post/org-babel-setup/][Blog-Post von Ryan Himmelwright]] übernommen.
-
 * Lizenz/Licence
 Emacs Configuration © 2025 by Eric Haberstroh is licensed under Creative Commons Attribution 4.0 International. To view a copy of this license, visit https://creativecommons.org/licenses/by/4.0/
 * Customization-System
@@ -269,14 +268,6 @@ Da ich auch Consult verwende, sollte =embark-consult= installiert werden.
     (global-company-mode))
 #+end_src
 * Benutzeroberfläche
-** Emacs-Fenster maximiert starten
-Emacs soll den gesamten Bildschirm einnehmen, wenn ich ihn starte. Weitere Frames müssen jedoch nicht maximiert sein, wenn sie erstellt werden. In Frage kommt also die =initial-frame-alist=. Leider kann diese nur in der [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Early-Init-File.html][Early Init File]] beeinflusst werden, da die übrigen Init-Dateien gelesen werden, nachdem das erste Frame bereits erstellt worden ist.
-
-Die folgende Option hat hier also **keinen Effekt** und befindet sich stattdessen in =~/.emacs.d/early-init.el=.
-
-#+BEGIN_SRC emacs-lisp
-  ;;(add-to-list 'initial-frame-alist '(fullscreen . maximized))
-#+END_SRC
 ** Menüleiste, Toolbar und Scrollbar ausblenden
 Ich möchte eine saubere Benutzeroberfläche ohne Knöpfe und Leisten, die ich ohnehin nicht verwende. Auf MacOS kann die Menüleiste eingeblendet bleiben, da sie ohnehin ins System integriert ist. Auf anderen Betriebssystemen soll sie ausgeblendet werden. Die Toolbar möchte ich nie sehen, ebenso wenig wie Scrollbalken.
 

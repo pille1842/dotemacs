@@ -1,33 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-;;; early-init.el --- Early Startup File for Emacs Configuration of Eric Haberstroh -*- lexical-binding: t -*-
-
-;; Copyright (C) 2023 Eric Haberstroh <eric@erichaberstroh.de>
-
-;; Author: Eric Haberstroh <eric@erichaberstroh.de>
-;; Created: 2023-07-25
-;; Homepage: https://github.com/pille1842/dotemacs
-;; Keywords: init
-;; Package-Requires: ((emacs "28.2"))
-;; SPDX-License-Identifier: GPL
-;; Version: 0.1.0
-
-;;; Commentary:
-
-;; This file is loaded early in the startup process of Emacs.
-
-;;; Code:
-
-;; -------- PACKAGE MANAGEMENT --------
-
-(setq package-enable-at-startup nil)
-
-;;; early-init.el ends here
-=======
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
-(setenv "LIBRARY_PATH" "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
->>>>>>> 69277aa (Initial commit)
-=======
 ;;; early-init.el --- Emacs Early Initialization File -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2025 Eric Haberstroh
@@ -53,8 +23,8 @@
 
 ;;; Code:
 
-(add-to-list 'initial-frame-alist '(fullboth . fullboth))
-(setenv "LIBRARY_PATH" "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib/gcc/current/gcc/aarch64-apple-darwin24/15")
+(when system-type "darwin"
+      (setenv "LIBRARY_PATH" "/opt/homebrew/lib/gcc/current:/opt/homebrew/lib/gcc/current/gcc/aarch64-apple-darwin24/15"))
 
 ;;; early-init.el ends here
->>>>>>> 321bdef (Add license and basic commentary to all files)
+
