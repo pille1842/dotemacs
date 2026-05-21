@@ -354,7 +354,7 @@ Mit =C-c a= möchte ich die anstehenden Aufgaben und Termine sehen. Dazu lege ic
 
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c a") #'org-agenda)
-  (setq org-agenda-files (list my-org-directory))
+  (setq org-agenda-files '("~/Org/eingang.org" "~/Org/projekte.org" "~/Org/wiedervorlage.org"))
 #+END_SRC
 ** Org Capture
 Mit =C-c c= möchte ich [[https://orgmode.org/manual/Capture.html][Org Capture]] aufrufen. Standardmäßig sollen Notizen in =~/Org/index.org= landen.
@@ -367,11 +367,67 @@ Mit =C-c c= möchte ich [[https://orgmode.org/manual/Capture.html][Org Capture]]
 Im Folgenden werden die Templates konfiguriert, die ich nutze.
 
 #+begin_src emacs-lisp
-    (setq org-capture-templates
-          '(("j" "Journal" entry (file+olp+datetree "~/Org/journal.org")
-             "* %U\n\n  %i%?")
-            ("t" "Todo" entry (file+headline "~/Org/todo.org" "Aufgaben")
-             "* TODO %?\n  %i\n  %a")))
+  (setq org-capture-templates
+        '(("t" "Todo [Eingang]" entry
+           (file+headline "~/Org/eingang.org" "Aufgaben")
+           "* TODO %i%?")
+          ("w" "Wiedervorlage" entry
+           (file+headline "~/Org/wiedervorlage.org" "Wiedervorlagen")
+           "* %i%? \n %U")))
+#+end_src
+** Org Refile
+Für meinen Getting-Things-Done-Workflow leere ich täglich meine Inbox und bewege Elemente in die passende Datei.
+#+begin_src emacs-lisp
+  (setq org-refile-targets '(("~/Org/projekte.org" :maxlevel . 3)
+                             ("~/Org/irgendwann.org" :level . 1)
+                             ("~/Org/wiedervorlage.org" :maxlevel . 2)))
+#+end_src
+** Todo-Keywords
+Meine Todos sollen folgende Zustände haben.
+#+begin_src emacs-lisp
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+#+end_src
+** GTD-Kontext
+Ich verwende verschiedene Tags als GTD-Keywords: @zuhause, @büro, @einkaufen, @email, @telefon, @internet.
+
+Für diese Tags will ich jeweils eine passende Agenda anzeigen können. Dabei soll nach GTD-Logik jeweils nur die erste unerledigte Aufgabe eines Projekts, die "Next Action", angezeigt werden.
+
+#+begin_src emacs-lisp
+  (setq org-agenda-custom-commands
+        '(("z" "Zuhause" tags-todo "@zuhause"
+           ((org-agenda-overriding-header "Zuhause")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))
+          ("b" "Büro" tags-todo "@büro"
+           ((org-agenda-overriding-header "Büro")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))
+          ("k" "Einkaufen" tags-todo "@einkaufen"
+           ((org-agenda-overriding-header "Einkaufen")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))
+          ("l" "E-Mail" tags-todo "@email"
+           ((org-agenda-overriding-header "E-Mail")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))
+          ("f" "Telefon" tags-todo "@telefon"
+           ((org-agenda-overriding-header "Telefon")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))
+          ("i" "Internet" tags-todo "@internet"
+           ((org-agenda-overriding-header "Internet")
+            (org-agenda-skip-function #'my-org-agenda-only-next-actions)))))
+
+  (defun my-org-agenda-only-next-actions ()
+    "Skip all but the first non-done entry."
+    (let (should-skip-entry)
+      (unless (org-current-is-todo)
+        (setq should-skip-entry t))
+      (save-excursion
+        (while (and (not should-skip-entry) (org-goto-sibling t))
+          (when (org-current-is-todo)
+            (setq should-skip-entry t))))
+      (when should-skip-entry
+        (or (outline-next-heading)
+            (goto-char (point-max))))))
+
+  (defun org-current-is-todo ()
+    (string= "TODO" (org-get-todo-state)))
 #+end_src
 * Magit
 [[https://magit.vc][Magit]] ist eine Git-Oberfläche für Emacs.
