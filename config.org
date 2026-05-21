@@ -306,6 +306,17 @@ Mit =M-s o= kann Occur aufgerufen werden, um alle Zeilen im aktuellen Buffer zu 
                  (post-command-select-window . t)
                  (dedicated . t)))
 #+end_src
+*** Buffer List immer unterhalb des aufrufenden Fensters
+Genauso wie Occur soll sich auch die *Buffer List* verhalten.
+#+begin_src emacs-lisp
+  (add-to-list 'display-buffer-alist
+               '("\\*Buffer List\\*"
+                 (display-buffer-reuse-window
+                  display-buffer-below-selected)
+                 (window-height . fit-window-to-buffer)
+                 (post-command-select-window . t)
+                 (dedicated . t)))
+#+end_src
 * Orgmode
 ** Beim Laden von Org-Dateien den Visual Line Mode aktivieren
 Mit [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Visual-Line-Mode.html][Visual Line Mode]] werden Wörter in langen Zeilen umgebrochen. Dies ist für Org-Dateien meine gewünschte Voreinstellung.
