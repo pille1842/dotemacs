@@ -281,7 +281,14 @@ Ich möchte eine saubere Benutzeroberfläche ohne Knöpfe und Leisten, die ich o
 Ich verwende [[https://github.com/protesilaos/iosevka-comfy][Iosevka Comfy]] in Schriftgröße 17.
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Iosevka Comfy Duo" :height 170)
+  (set-face-attribute 'default
+                      nil
+                      :font
+                      (if (eq system-type 'darwin)
+                          "Iosevka Comfy" ; für macOS
+                        "Iosevka Comfy Duo") ; für GNU/Linux
+                      :height
+                      170)
 #+END_SRC
 ** Themes von Protesilaos konfigurieren
 Die [[https://github.com/protesilaos/ef-themes][ef-themes]] sind eine Sammlung schöner Themes von Protesilaos Stavrou.
