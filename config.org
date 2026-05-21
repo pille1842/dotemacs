@@ -245,8 +245,8 @@ Da ich auch Consult verwende, sollte =embark-consult= installiert werden.
      consult-theme :preview-key '(:debounce 0.2 any)
      consult-ripgrep consult-git-grep consult-grep consult-man
      consult-bookmark consult-recent-file consult-xref
-     consult--source-bookmark consult--source-file-register
-     consult--source-recent-file consult--source-project-recent-file
+     ;consult--source-bookmark consult--source-file-register
+     ;consult--source-recent-file consult--source-project-recent-file
      ;; :preview-key "M-."
      :preview-key '(:debounce 0.4 any))
 
@@ -281,7 +281,7 @@ Ich möchte eine saubere Benutzeroberfläche ohne Knöpfe und Leisten, die ich o
 Ich verwende [[https://github.com/protesilaos/iosevka-comfy][Iosevka Comfy]] in Schriftgröße 17.
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Iosevka Comfy" :height 170)
+  (set-face-attribute 'default nil :font "Iosevka Comfy Duo" :height 170)
 #+END_SRC
 ** Themes von Protesilaos konfigurieren
 Die [[https://github.com/protesilaos/ef-themes][ef-themes]] sind eine Sammlung schöner Themes von Protesilaos Stavrou.
@@ -290,7 +290,7 @@ Die [[https://github.com/protesilaos/ef-themes][ef-themes]] sind eine Sammlung s
   (use-package ef-themes
     :ensure t
     :config
-    (ef-themes-select 'ef-light))
+    (modus-themes-load-theme 'ef-light))
 #+END_SRC
 ** Regeln für Fenster
 In der =display-buffer-alist= können Regeln für die Erstellung von Fenstern hinterlegt werden.
@@ -364,6 +364,14 @@ Im Folgenden werden die Templates konfiguriert, die ich nutze.
     :init
     (setq magit-define-global-key-bindings 'recommended))
 #+END_SRC
+* Markdown
+Es fehlt standardmäßig ein Modus zum Bearbeiten von Markdown-Dateien!
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command '("pandoc" "--from=markdown" "--to=html5")))
+#+end_src
 * Offene Aufgaben
 ** DONE Schriftgrößen einstellen
 ** DONE Org-Dateien mit Truncate-Lines öffnen
