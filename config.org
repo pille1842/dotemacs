@@ -70,6 +70,12 @@ Der mittlerweile in Emacs inkludierte [[https://elpa.gnu.org/packages/which-key.
 #+BEGIN_SRC emacs-lisp
   (which-key-mode)
 #+END_SRC
+** Region löschen, wenn Text eingegeben wird
+Standardmäßig wird eingegebener Text am Point eingefügt, egal ob eine Region ausgewählt ist oder nicht. Ich möchte das Standardverhalten der meisten Anwendungen, nämlich dass Text gelöscht wird, wenn er ausgewählt ist und etwas eingegeben wird.
+
+#+begin_src emacs-lisp
+  (delete-selection-mode 1)
+#+end_src
 * Betriebssystemspezifika
 ** MacOS-Tasten Control, Option und Command konfigurieren
 Die folgenden Variablen legen das Verhalten der MacOS-spezifischen Tasten Control, Option und Command fest. Folgende Konfiguration wünsche ich mir:
