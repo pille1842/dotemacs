@@ -76,6 +76,12 @@ Standardmäßig wird eingegebener Text am Point eingefügt, egal ob eine Region 
 #+begin_src emacs-lisp
   (delete-selection-mode 1)
 #+end_src
+** Kürzlich geöffnete Dateien tracken
+Mittels [[help:recentf-mode][recentf-mode]] können kürzlich geöffnete Dateien in einer Liste gespeichert und später leichter wieder geöffnet werden.
+
+#+begin_src emacs-lisp
+  (recentf-mode 1)
+#+end_src
 * Betriebssystemspezifika
 ** MacOS-Tasten Control, Option und Command konfigurieren
 Die folgenden Variablen legen das Verhalten der MacOS-spezifischen Tasten Control, Option und Command fest. Folgende Konfiguration wünsche ich mir:
