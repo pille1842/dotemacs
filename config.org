@@ -283,6 +283,12 @@ Ich möchte eine saubere Benutzeroberfläche ohne Knöpfe und Leisten, die ich o
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 #+END_SRC
+** Splash Screen deaktivieren
+Der Splash Screen ist hässlich und bringt mir nichts.
+
+#+begin_src emacs-lisp
+  (setq inhibit-splash-screen t)
+#+end_src
 ** Schriftart und Schriftgröße einstellen
 Ich verwende [[https://github.com/protesilaos/iosevka-comfy][Iosevka Comfy]] in Schriftgröße 17.
 
